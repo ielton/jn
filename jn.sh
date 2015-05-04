@@ -7,6 +7,14 @@
 #
 #########################################################################################
 
+# CONFIG GLOBAIS
+WSRC="lynx --source http://jovemnerd.com.br/feed/?cat=42";
+#DEFINE LISTA LOCAL PARA LISTA
+LIST="nerdcast.list";
+#DEFINE LOCAL PARA LISTA TEMPORARIA
+TLST="/tmp/nerdcast.tmp";
+
+
 # VERIFICA SE O ARQUIVO DE LISTA FOI CRIADO. 
 
 if [ ! -e nerdcast.list ];
@@ -14,16 +22,10 @@ if [ ! -e nerdcast.list ];
 then
 
 # CASO NAO, ELE CRIA A LISTA DE TODOS OS LINKS PARA OS NERDCASTS
-lynx --source http://jovemnerd.com.br/feed/?cat=42 | awk '/link>http\:\/\/jovemnerd\.com\.br\/nerdcast\// {print $1}' | sed -e :a -e 's/<[^>]*>//g' > nerdcast.list;
+
+$WSRC | sed -n -e '/<comments>.*/d' -e '/<dc:creator>/d' -e '/<category>/d' -e '/<guid.*/d' -e '/<description>.*/d' -e '/<blockquote>/,/<\/item>/d' -e 's/\+0000//g' -e 's/\t//g' -e '/<title>Nerdcast [0-9]\{1,9\}/,+25p' | sed -e :a -e 's/<[^>]*>//g' -e '/^$/d' -e '/Nerdcast [0-9]\{1,9\}.*/{x;p;x;}' -e 's/&#8211;/-/g' -e 's/&#8220;/\“/g' -e 's/&#8221;/\”/g' -e 's/&#8230;/…/g' -e 's/&#215;/×/g' -e 's/&#8216;/\‘/g' -e 's/&#038;/\&/g' -e "s/&#8217;/\'/g" > $LIST;
 
 fi
-
-###################################################
-# ATENCAO - CONFIGURACOES DO SISTEMA - ATENCAO
-###################################################
-
-# CONFIGURACOES DE FEED
-FEED="http://feed.nerdcast.com.br/";
 
 ###################################################
 # DEFINICAO DE FUNCOES
@@ -35,19 +37,18 @@ update()
 {
 
 # BAIXA LISTA TEMPORARIA
-lynx --source "$FEED" -connect_timeout=120| awk '/link>http\:\/\/jovemnerd\.com\.br\/nerdcast\// {print $1}' | sed -e :a -e 's/<[^>]*>//g' > /tmp/nerdcast.tmp;
+$WSRC | sed -n -e '/<comments>.*/d' -e '/<dc:creator>/d' -e '/<category>/d' -e '/<guid.*/d' -e '/<description>.*/d' -e '/<blockquote>/,/<\/item>/d' -e 's/\+0000//g' -e 's/\t//g' -e '/<title>Nerdcast [0-9]\{1,9\}/,+25p' | sed -e :a -e 's/<[^>]*>//g' -e '/^$/d' -e '/Nerdcast [0-9]\{1,9\}.*/{x;p;x;}' -e 's/&#8211;/-/g' -e 's/&#8220;/\“/g' -e 's/&#8221;/\”/g' -e 's/&#8230;/…/g' -e 's/&#215;/×/g' -e 's/&#8216;/\‘/g' -e 's/&#038;/\&/g' -e "s/&#8217;/\'/g" > $TLST;
 
 # VERIFICA A DIFERENCAO ENTRE A LISTA LOCAL E A LISTA DO SERVIDOR
-LASTNC=$(diff nerdcast.list /tmp/nerdcast.tmp | sed -n '2p' | cut -c 3-)
+LASTNC=$(diff nerdcast.list /tmp/nerdcast.tmp | sed -n '2p' | cut -c 3-);
+
 # VERIFICA SE $LASTNC TEM ALGUM VALOR ATRIBUIDO
-if [ ! -z $LASTNC ];
+if [ ! -z "$LASTNC" ];
 
 then
-COMMENT_ID=$(lynx --source $LASTNC -connect_timeout=120| grep comment_post_ID | awk '{ print $4 }' | cut -b 8-20 | sed 's/[^0-9]//g')
-# SINCRONIZA A LISTA LOCAL COM A TEMPORARIA
-cat /tmp/nerdcast.tmp > nerdcast.list && echo "Lista atualizada!"
 
-echo $LASTNC;
+# SINCRONIZA A LISTA TEMPORARIA COM A LOCAL
+cat /tmp/nerdcast.tmp > nerdcast.list && printf "Lista atualizada! \nÚltimo EP: $LASTNC \n";
 
 else
 # ENVIA UMA MENSAGEM, CASO NENHUMA ATUALIZACAO SEJA ENCONTRADA
@@ -70,6 +71,7 @@ cat nerdcast.list | grep $1
 
 get()
 {
+#cat nerdcast.list | sed -n '/http:\/\/jovemnerd\.com\.br\/nerdcast\//p' | grep 01 | cut -c34- | sed 's/\///g'
 lynx -dump $1 | awk '/zip/{print $2}' | xargs wget -O /tmp/nerdcast_tmp.zip && unzip /tmp/nerdcast_tmp.zip -d nerdcasts/
 }
 
@@ -118,7 +120,6 @@ echo "Uso:
     jn upgrade - Atualiza insistentemente e comenta assim que a lista esteja atualizada.
     jn search [N° NERDCAST][PALAVRA CHAVE]
     jn get [URL]
-    jn comment numero_nerdcast nome url email comentario
     Para mais informações:  jn --help"
 ;;
 
