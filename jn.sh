@@ -62,7 +62,8 @@ fi
 ################################
 search()
 {
-cat nerdcast.list | grep $1
+cat nerdcast.list | sed -n '/http:\/\/jovemnerd\.com\.br\/nerdcast\//p' | grep $1 | cut -c34- | sed 's/\///g'
+#cat nerdcast.list | grep $1
 }
 
 ###############################
