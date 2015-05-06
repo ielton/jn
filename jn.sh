@@ -57,7 +57,7 @@ fi
 ################################
 search()
 {
-cat nerdcast.list | sed -n -e '/http:\/\/jovemnerd\.com\.br\/nerdcast\//!d;p' | sed  's/.*\/nerdcast\///g; s/\///g; s/nerdcast-//g' | grep $1;
+cat nerdcast.list | sed -n -e '/http:\/\/jovemnerd\.com\.br\/nerdcast\//!d;p' | sed  's/.*\/nerdcast\///g; s/\///g; s/^nerdcast-//g' | grep $1;
 
 }
 
@@ -67,7 +67,14 @@ cat nerdcast.list | sed -n -e '/http:\/\/jovemnerd\.com\.br\/nerdcast\//!d;p' | 
 
 get()
 {
-lynx -dump $1 | awk '/zip/{print $2}' | xargs wget -O /tmp/nerdcast_tmp.zip && unzip /tmp/nerdcast_tmp.zip -d nerdcasts/
+URL=$(cat nerdcast.list | grep $1);
+if [ -z $URL ];
+echo "Baixando de: $URL";
+then
+lynx -dump $URL | awk '/zip/{print $2}' | xargs wget -O /tmp/nerdcast_tmp.zip && unzip /tmp/nerdcast_tmp.zip -d nerdcasts/
+else
+echo "Use a funcao 'search' para localizar o titulo do nerdcast!";
+fi
 }
 
 case $1 in
@@ -89,7 +96,6 @@ done
 
 if [ ! -z $LASTNC ];
 then
-    ecomment
 URLNC=$LASTNC
     get
 
