@@ -6,7 +6,7 @@
 # DESCRICAO 	: Esse cria e atualiza a lista dos nerdcasts, tambem realiza 
 #		  comentarios
 #
-####################################################################################
+###################################################################################
 
 # CONFIG GLOBAIS
 WSRC="lynx --source http://jovemnerd.com.br/feed/?cat=42";
@@ -20,20 +20,19 @@ if [ ! -e nerdcast.list ];
 
 then
 # CASO NAO, ELE CRIA A LISTA DE TODOS OS LINKS PARA OS NERDCASTS
-$WSRC | sed -n -e '/<comments>.*/d' -e '/<dc:creator>/d' -e '/<category>/d' -e '/<guid.*/d' -e '/<description>.*/d' -e '/<blockquote>/,/<\/item>/d' -e 's/\+0000//g' -e 's/\t//g' -e '/<title>Nerdcast [0-9]\{1,9\}/,+25p' | sed -e :a -e 's/<[^>]*>//g' -e '/^$/d' -e '/Nerdcast [0-9]\{1,9\}.*/{x;p;x;}' -e 's/&#8211;/-/g' -e 's/&#8220;/\“/g' -e 's/&#8221;/\”/g' -e 's/&#8230;/…/g' -e 's/&#215;/×/g' -e 's/&#8216;/\‘/g' -e 's/&#038;/\&/g' -e "s/&#8217;/\'/g" > $LIST;
+$WSRC | sed -n -e '/<title>Nerdcast .*/p;/<link>http:\/\/jovemnerd.com.br\/nerdcast\//p;/<pubDate>/p;/<description>/p;/<itunes:duration>/p' | sed -e 's/<itunes:duration>/Duração: /g;s/<\!\[CDATA\[//g;s/<[^>]*>//g;1d;s/\t//g;s/\+0000//g;/Nerdcast .*/{x;p;x;}' -e 's/&#8211;/-/g' -e 's/&#8220;/\“/g' -e 's/&#8221;/\”/g' -e 's/&#8230;/…/g' -e 's/&#215;/×/g' -e 's/&#8216;/\‘/g' -e 's/&#038;/\&/g' -e "s/&#8217;/\'/g" > $LIST;
 
 fi
 
-###################################################
-# DEFINICAO DE FUNCOES
-###################################################
+##########################
+#  DEFINICAO DE FUNCOES  #
+##########################
 
 # FUNCAO PARA ATUALIZAR LISTA
 update()
 {
-
 # BAIXA LISTA TEMPORARIA
-$WSRC | sed -n -e '/<comments>.*/d' -e '/<dc:creator>/d' -e '/<category>/d' -e '/<guid.*/d' -e '/<description>.*/d' -e '/<blockquote>/,/<\/item>/d' -e 's/\+0000//g' -e 's/\t//g' -e '/<title>Nerdcast [0-9]\{1,9\}/,+25p' | sed -e :a -e 's/<[^>]*>//g' -e '/^$/d' -e '/Nerdcast [0-9]\{1,9\}.*/{x;p;x;}' -e 's/&#8211;/-/g' -e 's/&#8220;/\“/g' -e 's/&#8221;/\”/g' -e 's/&#8230;/…/g' -e 's/&#215;/×/g' -e 's/&#8216;/\‘/g' -e 's/&#038;/\&/g' -e "s/&#8217;/\'/g" > $TLST;
+$WSRC |  sed -n -e '/<title>Nerdcast .*/p;/<link>http:\/\/jovemnerd.com.br\/nerdcast\//p;/<pubDate>/p;/<description>/p;/<itunes:duration>/p' | sed -e 's/<itunes:duration>/Duração: /g;s/<\!\[CDATA\[//g;s/<[^>]*>//g;1d;s/\t//g;s/\+0000//g;/Nerdcast .*/{x;p;x;}' -e 's/&#8211;/-/g' -e 's/&#8220;/\“/g' -e 's/&#8221;/\”/g' -e 's/&#8230;/…/g' -e 's/&#215;/×/g' -e 's/&#8216;/\‘/g' -e 's/&#038;/\&/g' -e "s/&#8217;/\'/g" > $TLST;
 
 # VERIFICA A DIFERENCAO ENTRE A LISTA LOCAL E A LISTA DO SERVIDOR
 LASTNC=$(diff nerdcast.list /tmp/nerdcast.tmp | sed -n '2p' | cut -c 3-);
@@ -122,5 +121,4 @@ echo "Uso:
     jn get [URL]
     Para mais informações:  jn --help"
 ;;
-
 esac
