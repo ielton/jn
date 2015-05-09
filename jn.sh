@@ -56,10 +56,24 @@ fi
 ################################
 search()
 {
-cat nerdcast.list | sed -n -e '/http:\/\/jovemnerd\.com\.br\/nerdcast\//!d;p' | sed  's/.*\/nerdcast\///g; s/\///g; s/^nerdcast-//g' | grep $1;
+cat $LIST | sed -n -e '/http:\/\/jovemnerd\.com\.br\/nerdcast\//!d;p' | sed  's/.*\/nerdcast\///g; s/\///g; s/^nerdcast-//g' | grep $1;
 
 }
 
+####################################
+# FUNCAO QUE MOSTRA DETALHES DO NC
+####################################
+show()
+{
+er="^[0-9]+$";
+#if [ [ $1 -eq $er ] ];
+if echo $1 | egrep '^[0-9]+$' > /dev/null;
+then
+cat $LIST | sed -n -e "/Nerdcast $1 -/,+4p";
+else
+cat $LIST | sed -n -e "/Nerdcast [0-9]\{2,9\} -.*$1.*/I,+4p";
+fi
+}
 ###############################
 # FUNCAO PARA BAIXAR NERDCAST
 ###############################
@@ -103,12 +117,14 @@ else
 fi
 ;;
 
-comment)
+show)
+show $2;
 ;;
+
 search)
 search $2;
-
 ;;
+
 get)
 get $2;
 ;;
