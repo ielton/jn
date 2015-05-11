@@ -56,7 +56,13 @@ fi
 ################################
 search()
 {
-cat $LIST | sed -n -e '/http:\/\/jovemnerd\.com\.br\/nerdcast\//!d;p' | sed  's/.*\/nerdcast\///g; s/\///g; s/^nerdcast-//g' | grep $1;
+if ! cat $LIST | sed -n -e '/http:\/\/jovemnerd\.com\.br\/nerdcast\//!d;p' | sed  's/.*\/nerdcast\///g; s/\///g; s/^nerdcast-//g' | grep -i $1;
+
+then
+
+echo "Não achei nada :(";
+
+fi
 
 }
 
@@ -70,8 +76,10 @@ er="^[0-9]+$";
 if echo $1 | egrep '^[0-9]+$' > /dev/null;
 then
 cat $LIST | sed -n -e "/Nerdcast $1 -/,+4p";
+
 else
 cat $LIST | sed -n -e "/Nerdcast [0-9]\{2,9\} -.*$1.*/I,+4p";
+
 fi
 }
 ###############################
@@ -130,10 +138,10 @@ get $2;
 ;;
 *)
 echo "Uso:
-
     jn update  - Atualiza a lista de nerdcasts.
-    jn upgrade - Atualiza insistentemente e comenta assim que a lista esteja atualizada.
+    jn upgrade - Tenta insistentemente atualizar lista.
     jn search [N° NERDCAST][PALAVRA CHAVE]
+    jn show [N° NERDCAST][PALAVRA CHAVE]
     jn get [URL]
     Para mais informações:  jn --help"
 ;;
