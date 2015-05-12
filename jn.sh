@@ -10,10 +10,16 @@
 
 # CONFIG GLOBAIS
 WSRC="lynx --source http://jovemnerd.com.br/feed/?cat=42";
-#DEFINE LISTA LOCAL PARA LISTA
+# DIRETORIO DOS NERDCASTS
+NDIR=$HOME"/nerdcasts";
+# DEFINE LISTA LOCAL PARA LISTA
 LIST="nerdcast.list";
-#DEFINE LOCAL PARA LISTA TEMPORARIA
+# DEFINE LOCAL PARA LISTA TEMPORARIA
 TLST="/tmp/nerdcast.tmp";
+if [ ! -d $NDIR ];
+then
+mkdir $NDIR;
+fi
 
 # VERIFICA SE O ARQUIVO DE LISTA FOI CRIADO. 
 if [ ! -e nerdcast.list ];
@@ -48,7 +54,6 @@ else
 # ENVIA UMA MENSAGEM, CASO NENHUMA ATUALIZACAO SEJA ENCONTRADA
     echo "Os arquivos já estavam atualizados, nenhuma atualização realizada!";
 fi
-
 }
 
 ################################
@@ -59,7 +64,6 @@ search()
 if ! cat $LIST | sed -n -e '/http:\/\/jovemnerd\.com\.br\/nerdcast\//!d;p' | sed  's/.*\/nerdcast\///g; s/\///g; s/^nerdcast-//g' | grep -i $1;
 
 then
-
 echo "Não achei nada :(";
 
 fi
@@ -71,8 +75,6 @@ fi
 ####################################
 show()
 {
-er="^[0-9]+$";
-#if [ [ $1 -eq $er ] ];
 if echo $1 | egrep '^[0-9]+$' > /dev/null;
 then
 cat $LIST | sed -n -e "/Nerdcast $1 -/,+4p";
@@ -82,17 +84,17 @@ cat $LIST | sed -n -e "/Nerdcast [0-9]\{2,9\} -.*$1.*/I,+4p";
 
 fi
 }
+
 ###############################
 # FUNCAO PARA BAIXAR NERDCAST
 ###############################
-
 get()
 {
 URL=$(cat nerdcast.list | grep $1);
 if [ -z $URL ];
 echo "Baixando de: $URL";
 then
-lynx -dump $URL | awk '/zip/{print $2}' | xargs wget -O /tmp/nerdcast_tmp.zip && unzip /tmp/nerdcast_tmp.zip -d nerdcasts/
+lynx -dump $URL | awk '/\.mp3/{print $2}' | head -n1 | xargs wget -P $NDIR
 else
 echo "Use a funcao 'search' para localizar o titulo do nerdcast!";
 fi
