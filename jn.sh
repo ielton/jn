@@ -85,18 +85,25 @@ cat $LIST | sed -n -e "/Nerdcast [0-9]\{1,9\}.* -.*$1.*/I,+5p";
 fi
 }
 
-###############################
-# FUNCAO PARA BAIXAR NERDCAST
-###############################
+###############################                                                                                                               
+# FUNCAO PARA BAIXAR NERDCAST                                                                                                                 
+###############################                                                                                                               
 get()
 {
-URL=$(cat nerdcast.list | egrep "\-$1");
-if [ -z $URL ];
-echo "Baixando de: $URL";
+URL=$(cat nerdcast.list | egrep "http\:\/\/jovemnerd\.com\.br\/nerdcast\/$1|\http\:\/\/jovemnerd\.com\.br\/nerdcast\/nerdcast\-$1\-");
+if (( $(grep -c . <<<"$URL") > 1 ));
 then
-lynx -dump $URL | awk '/\.mp3/{print $2}' | head -n1 | xargs wget -P $NDIR
+printf "\nSua busca retornou muitos resultados, tente ser mais específico! resultados:\n\n";
+echo $URL;
+printf "\nDica: Copie e cole a url desejada, ex: ./jn get http://minhaurl.com.br\n";
 else
-echo "Use a funcao 'search' para localizar o titulo do nerdcast!";
+        if [ ! -z $URL ];
+        then
+	echo "Baixando de: $URL";
+        lynx -dump $URL | awk '/\.mp3/{print $2}' | head -n1 | xargs wget -P $NDIR
+        else
+        echo "Não localizado, use a função 'show' para mais detalhes!";
+        fi
 fi
 }
 
