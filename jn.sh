@@ -90,7 +90,7 @@ fi
 ###############################
 get()
 {
-URL=$(cat nerdcast.list | grep $1);
+URL=$(cat nerdcast.list | egrep "\-$1");
 if [ -z $URL ];
 echo "Baixando de: $URL";
 then
