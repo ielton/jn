@@ -77,10 +77,10 @@ show()
 {
 if echo $1 | egrep '^[0-9]+$' > /dev/null;
 then
-cat $LIST | sed -n -e "/Nerdcast $1.* -/,+5p";
+cat $LIST | sed -n -e "/Nerdcast $1.*/,+5p";
 
 else
-cat $LIST | sed -n -e "/Nerdcast [0-9]\{1,9\}.* -.*$1.*/I,+5p";
+cat $LIST | sed -n -e "/Nerdcast [0-9]\{1,9\}.*$1.*/I,+5p";
 
 fi
 }
