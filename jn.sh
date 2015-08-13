@@ -91,6 +91,7 @@ fi
 get()
 {
 URL=$(cat nerdcast.list | egrep "http\:\/\/jovemnerd\.com\.br\/nerdcast\/$1|\http\:\/\/jovemnerd\.com\.br\/nerdcast\/nerdcast\-$1\-");
+TITLE=$(lynx --source $URL | sed -n -e '/<title>/p' | sed 's/&#8211;/-/g;s/<[^>]*>//g;s/Jovem Nerd |   //g;s/\t//g');
 if (( $(grep -c . <<<"$URL") > 1 ));
 then
 printf "\nSua busca retornou muitos resultados, tente ser mais específico! resultados:\n\n";
@@ -99,10 +100,18 @@ printf "\nDica: Copie e cole a url desejada, ex: ./jn get http://minhaurl.com.br
 else
         if [ ! -z $URL ];
         then
-	echo "Baixando de: $URL";
-        lynx -dump $URL | awk '/\.mp3/{print $2}' | head -n1 | xargs wget -P $NDIR
-        else
-        echo "Não localizado, use a função 'show' para mais detalhes!";
+	    MP3=$(lynx -dump $URL | awk '/\.mp3/{ print $2}' | head -n1);
+	    NUMCH=$(echo $MP3 | wc -c);
+	    NUMCHF=$((NUMCH+10))
+	    HEADFOOT=$(seq -s\# $NUMCHF | tr -d '[:digit:]');
+	    printf "\n\t$HEADFOOT\n";
+	    printf "\t# Título: $TITLE\n";
+	    printf "\t# Link: $URL\n";
+	    printf "\t# MP3: $MP3\n";
+	    printf "\t$HEADFOOT\n\n";
+	    echo $MP3 | xargs wget -P $NDIR
+	else
+	    echo "Não localizado, use a função 'show' para mais detalhes!";
         fi
 fi
 }
