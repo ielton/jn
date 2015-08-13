@@ -85,9 +85,7 @@ cat $LIST | sed -n -e "/Nerdcast [0-9]\{1,9\}.*$1.*/I,+5p";
 fi
 }
 
-###############################                                                                                                               
-# FUNCAO PARA BAIXAR NERDCAST                                                                                                                 
-###############################                                                                                                               
+###############################                                                                                                              # FUNCAO PARA BAIXAR NERDCAST                                                                                                                ###############################                                                                                                               
 get()
 {
 URL=$(cat nerdcast.list | egrep "http\:\/\/jovemnerd\.com\.br\/nerdcast\/$1|\http\:\/\/jovemnerd\.com\.br\/nerdcast\/nerdcast\-$1\-");
@@ -100,9 +98,10 @@ printf "\nDica: Copie e cole a url desejada, ex: ./jn get http://minhaurl.com.br
 else
         if [ ! -z $URL ];
         then
-	    MP3=$(lynx -dump $URL | awk '/\.mp3/{ print $2}' | head -n1);
-	    NUMCH=$(echo $MP3 | wc -c);
-	    NUMCHF=$((NUMCH+10))
+	    #MP3=$(lynx -dump $URL | awk '/\.mp3/{ print $2}' | head -n1);
+	    MP3=$(lynx -source $URL | awk '/\.mp3/{ print $2}' | head -n1 | cut -c 7- | sed -n 's/\"//g;p');
+	    NUMCH=$(echo $URL | wc -c);
+	    NUMCHF=$((NUMCH+12))
 	    HEADFOOT=$(seq -s\# $NUMCHF | tr -d '[:digit:]');
 	    printf "\n\t$HEADFOOT\n";
 	    printf "\t# Título: $TITLE\n";
