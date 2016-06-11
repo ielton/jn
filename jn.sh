@@ -88,7 +88,7 @@ fi
 ###############################                                                                                                              # FUNCAO PARA BAIXAR NERDCAST                                                                                                                ###############################                                                                                                               
 get()
 {
-URL=$(cat nerdcast.list | egrep "http\:\/\/jovemnerd\.com\.br\/nerdcast\/$1|\http\:\/\/jovemnerd\.com\.br\/nerdcast\/nerdcast\-$1\-");
+URL=$(cat nerdcast.list | egrep "http[s]\:\/\/jovemnerd\.com\.br\/nerdcast\/$1|\http[s]\:\/\/jovemnerd\.com\.br\/nerdcast\/nerdcast\-$1\-");
 TITLE=$(lynx --source $URL | sed -n -e '/<title>/p' | sed 's/&#8211;/-/g;s/<[^>]*>//g;s/Jovem Nerd |   //g;s/\t//g');
 if (( $(grep -c . <<<"$URL") > 1 ));
 then
