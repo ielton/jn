@@ -61,8 +61,7 @@ fi
 ################################
 search()
 {
-if ! cat $LIST | sed -n -e '/http
-[s]:\/\/jovemnerd\.com\.br\/nerdcast\//!d;p' | sed  's/.*\/nerdcast\///g; s/\///g; s/^nerdcast-//g' | grep -i $1;
+if ! cat $LIST | sed -n -e '/http[s]:\/\/jovemnerd\.com\.br\/nerdcast\//!d;p' | sed  's/.*\/nerdcast\///g; s/\///g; s/^nerdcast-//g' | grep -i $1;
 
 then
 echo "Não achei nada :(";
